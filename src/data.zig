@@ -1,32 +1,32 @@
-pub const SqlType = struct {
-    type: enum {
-        String,
-        Integer,
-        Decimal,
-        Boolean,
-        Table,
-    },
-    properties: union {
-        string: ?struct {
+pub const DataType = enum { string, integer, decimal, boolean };
+
+pub const ColumnType = struct {
+    datatype: union(DataType) {
+        string: struct {
             length: ?u32 = null,
         },
-        decimal: ?struct {
+        integer: struct {
+            bits: u32,
+            signed: bool,
+        },
+        decimal: struct {
             precision: u32,
             scale: u32,
         },
+        boolean: void,
     },
     nullable: bool,
 };
 
 pub const TableColumn = struct {
-    name: []u8,
+    name: []const u8,
     index: u32,
-    type: SqlType,
+    type: ColumnType,
 };
 
 pub const Table = struct {
-    database: []u8,
-    schema: []u8,
-    name: []u8,
+    database: []const u8,
+    schema: []const u8,
+    name: []const u8,
     columns: []TableColumn,
 };

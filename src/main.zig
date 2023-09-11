@@ -5,22 +5,8 @@ const data = @import("data.zig");
 
 pub fn main() !void {
     const hello: query.Expression = .{
-        .value = .{
-            .literal = .{
-                .string = "hello",
-            },
-        },
-        .type = .{
-            .type = .String,
-            .properties = .{
-                .string = .{
-                    .length = 5,
-                },
-            },
-            .nullable = false,
-        },
+        .literal = .{ .not_null = .{ .string = "hello" } },
     };
-
     var expr_list: [1]query.Expression = .{hello};
 
     const select = query.Select{ .values = &expr_list };

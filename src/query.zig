@@ -1,13 +1,8 @@
 pub const data = @import("data.zig");
 
-pub const LiteralValue = union {
-    string: []const u8,
-    integer: u64,
-    float: f64,
-    boolean: bool,
-};
+const TableIdentifierTag = enum { name, alias };
 
-pub const TableIdentifier = union {
+pub const TableIdentifier = union(TableIdentifierTag) {
     name: struct {
         database: ?[]u8 = null,
         schema: ?[]u8 = null,
@@ -18,15 +13,36 @@ pub const TableIdentifier = union {
 
 pub const ColumnValue = struct {
     tableIdentifier: TableIdentifier,
+    type: data.ColumnType,
     columnName: []u8,
 };
 
+pub const LiteralValueNullTag = enum { null, not_null };
+
+pub const LiteralValue = union(LiteralValueNullTag) {
+    not_null: union(data.DataType) {
+        string: []const u8,
+        integer: i64,
+        decimal: struct {
+            left: i64,
+            right: i64,
+        },
+        boolean: bool,
+    },
+    null: void,
+};
+
+pub const ValueExpressionTag = enum {
+    literal,
+    column,
+};
+
 pub const Expression = struct {
-    value: union {
+    value: union(ValueExpressionTag) {
         literal: LiteralValue,
         column: ColumnValue,
     },
-    type: data.SqlType,
+    alias: ?[]const u8 = null,
 };
 
 pub const Select = struct {
